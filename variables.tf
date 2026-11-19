@@ -399,6 +399,14 @@ EOT
   validation {
     condition = alltrue([
       for k, v in var.virtual_machine_scale_sets : (
+        v.storage_profile_data_disk == null || alltrue([for item in v.storage_profile_data_disk : (item.disk_size_gb == null || (item.disk_size_gb >= 0 && item.disk_size_gb <= 32767))])
+      )
+    ])
+    error_message = "must be between 0 and 32767"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.virtual_machine_scale_sets : (
         v.extension == null || alltrue([for item in v.extension : (item.provision_after_extensions == null || (alltrue([for x in item.provision_after_extensions : length(x) > 0])))])
       )
     ])
@@ -428,6 +436,6 @@ EOT
     ])
     error_message = "[from tags.Validate: invalid when len(value) > 50]"
   }
-  # Note: 26 additional provider-side validators are enforced at apply time but not mirrored as validation{} blocks here (bespoke or non-mechanically-translatable).
+  # Note: 25 additional provider-side validators are enforced at apply time but not mirrored as validation{} blocks here (bespoke or non-mechanically-translatable).
 }
 
